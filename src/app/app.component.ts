@@ -6,8 +6,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './app.html',
-  styleUrls: ['./app.css']
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
 
 export class AppComponent {
@@ -23,7 +23,7 @@ export class AppComponent {
     }
 
     const file = input.files[0];
-      if (file.type !== 'image.jpeg' && file.type !== 'image/png') {
+      if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
        this.errorMessage = 'Only JPEG and PNG formats are allowed.';
        this.resetSelection();
        return;
@@ -49,6 +49,7 @@ export class AppComponent {
     this.selectedImage = null;
     this.selectedFile = null;
   }
+
 
  }
 

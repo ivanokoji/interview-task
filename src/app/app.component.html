@@ -13,11 +13,24 @@
 
   <section class="preview-section">
     <div class="image-placeholder" *ngIf="!selectedImage">No image selected</div>
-    <img *ngIf="selectedImage" [src]="selectedImage" alt="Preview" class="image-preview"/>
+    
+    <div *ngIf="selectedImage" class="preview-container">
+      <img [src]="selectedImage" alt="Preview" class="image-preview" />
+      
+      <!-- New Extract Button -->
+      <button class="extract-button" (click)="extractText()" [disabled]="isLoading">
+        {{ isLoading ? 'Extracting Text...' : 'Extract Text' }}
+      </button>
+    </div>
   </section>
 
   <section class="result-section">
-    <textarea readonly placeholder="Extracted text will appear here..."></textarea>
-    <button class="copy-button" disabled>Copy to Clipboard</button>
+    
+    <textarea readonly placeholder="Extracted text will appear here..." [value]="extractedText"></textarea>
+    
+   
+    <button class="copy-button" (click)="copyToClipboard()" [disabled]="!extractedText">
+      Copy to Clipboard
+    </button>
   </section>
 </main>

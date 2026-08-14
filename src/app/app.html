@@ -6,12 +6,14 @@
 
   <section class="upload-section">
 
-    <input type="file" accept="image/jpeg, image/png" id="fileUpload"/>
+    <input type="file" accept="image/jpeg, image/png" id="fileUpload" (change)="onFileSelected($event)"/>
     <label for="fileUpload" class="upload-button">Select Image</label>
+    <p class="error-text" *ngIf="errorMessage"> {{errorMessage}} </p>
   </section>
 
   <section class="preview-section">
-    <div class="image-placeholder">No image selected</div>
+    <div class="image-placeholder" *ngIf="!selectedImage">No image selected</div>
+    <img *ngIf="selectedImage" [src]="selectedImage" alt="Preview" class="image-preview"/>
   </section>
 
   <section class="result-section">

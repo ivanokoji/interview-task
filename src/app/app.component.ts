@@ -1,6 +1,8 @@
-import { Component } from "@angular/core";
+import { Component, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { ApiService } from './api.service';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -14,12 +16,13 @@ export class AppComponent {
   errorMessage: string | null = null;
   selectedFile: File | null = null;
   
-  
   extractedText: string = '';
   isLoading: boolean = false;
 
-
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService, 
+    private cdr: ChangeDetectorRef
+  ) {}
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -49,37 +52,59 @@ export class AppComponent {
     const reader = new FileReader();
     reader.onload = () => {
       this.selectedImage = reader.result as string;
+      this.cdr.detectChanges();
     };
 
     reader.readAsDataURL(file);
   }
 
- 
   extractText(): void {
     if (!this.selectedFile) return;
 
     this.isLoading = true;
     this.errorMessage = null;
 
-    this.apiService.extractTextFromImage(this.selectedFile).subscribe({
-      next: (response) => {
-        
-        if (response && response.length > 0) {
-          this.extractedText = response.map((item: any) => item.text).join(' ');
-        } else {
-          this.extractedText = 'No text found in this image.';
-        }
+    this.apiService.extractTextFromImage(this.selectedFile).pipe(
+      catchError((err) => {
+        console.error('Caught by catchError operator:', err);
+        return of(null);
+      })
+    ).subscribe({
+      next: (response: any) => {
         this.isLoading = false;
+
+        if (!response) {
+          this.errorMessage = 'Received empty response from server.';
+          this.cdr.detectChanges();
+          return;
+        }
+
+        let parsedData = response;
+        if (typeof response === 'string') {
+          try {
+            parsedData = JSON.parse(response);
+          } catch (e) {
+            console.error('JSON parse error:', e);
+          }
+        }
+
+        if (Array.isArray(parsedData) && parsedData.length > 0) {
+          this.extractedText = parsedData.map((item: any) => item.text || '').join(' ');
+        } else {
+          this.extractedText = 'No text found.';
+        }
+
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        this.errorMessage = 'Failed to extract text. Please check your API key and try again.';
+        console.error('Subscription error block:', err);
+        this.errorMessage = 'Failed to extract text.';
         this.isLoading = false;
-        console.error(err);
+        this.cdr.detectChanges();
       }
     });
   }
 
-  
   copyToClipboard(): void {
     if (this.extractedText) {
       navigator.clipboard.writeText(this.extractedText);

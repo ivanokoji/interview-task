@@ -17,20 +17,18 @@
     <div *ngIf="selectedImage" class="preview-container">
       <img [src]="selectedImage" alt="Preview" class="image-preview" />
       
-      <!-- New Extract Button -->
-      <button class="extract-button" (click)="extractText()" [disabled]="isLoading">
-        {{ isLoading ? 'Extracting Text...' : 'Extract Text' }}
-      </button>
+     <button class="extract-button" (click)="extractText()" [disabled]="isLoading">
+  {{ isLoading ? 'Extracting Text...' : 'Extract Text' }}
+</button>
     </div>
   </section>
 
   <section class="result-section">
-    
-    <textarea readonly placeholder="Extracted text will appear here..." [value]="extractedText"></textarea>
-    
-   
-    <button class="copy-button" (click)="copyToClipboard()" [disabled]="!extractedText">
-      Copy to Clipboard
-    </button>
-  </section>
+  <textarea rows="8" readonly placeholder="Extracted text will appear here...">{{ extractedText }}</textarea>
+ 
+  <button class="copy-button" (click)="copyToClipboard()" [disabled]="!extractedText">
+    Copy to Clipboard
+  </button>
+</section>
+  
 </main>
